@@ -31,6 +31,7 @@ import androidx.navigation.NavHostController
 import com.diegoalarcon.weatherapp.data.DataOrException
 import com.diegoalarcon.weatherapp.model.Weather
 import com.diegoalarcon.weatherapp.model.WeatherItem
+import com.diegoalarcon.weatherapp.navigation.WeatherScreens
 import com.diegoalarcon.weatherapp.utils.formatDate
 import com.diegoalarcon.weatherapp.utils.formatDecimals
 import com.diegoalarcon.weatherapp.widgets.HumidityWindPressureRow
@@ -42,13 +43,14 @@ import com.diegoalarcon.weatherapp.widgets.WeatherStateImage
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    mainViewModel: MainViewModel = hiltViewModel()
+    mainViewModel: MainViewModel = hiltViewModel(),
+    city: String? = null
 ) {
 
     val weatherData = produceState<DataOrException<Weather, Boolean, Exception>>(
         initialValue = DataOrException(loading = true)
     ) {
-        value = mainViewModel.getWeatherData("Burzaco")
+        value = mainViewModel.getWeatherData(city.toString())
     }.value
 
     if (weatherData.loading == true) {
@@ -64,7 +66,10 @@ fun MainScaffold(weather: Weather, navController: NavController) {
         WeatherAppBar(
             title = weather.city.name + ", ${weather.city.country}",
             navController = navController,
-            elevation = 5.dp
+            elevation = 5.dp,
+            onAddActionClicked = {
+                navController.navigate(WeatherScreens.SearchScreen.name)
+            }
         )
     }) {
         MainContent(weather = weather)
